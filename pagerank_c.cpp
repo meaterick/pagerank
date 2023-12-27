@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <random>
+#include <time.h>
 
-const int a = 30;//행렬 크기 설정
+const int a = 100;//행렬 크기 설정
 
 void printMatrix(double matrix[a]) {
     for (int i = 0; i < a; ++i) {
@@ -11,7 +12,7 @@ void printMatrix(double matrix[a]) {
 }
 
 
-void matrixPower(double matrix[a][a], int exponent, double result[a][a]) {
+void matrixPower2(double matrix[a][a], int exponent, double result[a][a]) {
     for (int i = 0; i < a; ++i) {
         for (int j = 0; j < a; ++j) {
             result[i][j] = (i == j) ? 1.0 : 0.0;
@@ -30,12 +31,44 @@ void matrixPower(double matrix[a][a], int exponent, double result[a][a]) {
             for (int j = 0; j < a; ++j) {
                 result[i][j] = 0;
                 for (int k = 0; k < a; ++k) {
-                    result[i][j] += matrix[i][k] * temp[k][j];
+                	if (matrix[i][k] == 0) {
+                		result[i][j] = 0;
+					} else {
+						result[i][j] += matrix[i][k] * temp[k][j];
+					}
+                    
                 }
             }
         }
     }
 }
+
+void matrixPower1(double matrix[a][a], int exponent, double result[a][a]) {
+    for (int i = 0; i < a; ++i) {
+        for (int j = 0; j < a; ++j) {
+            result[i][j] = (i == j) ? 1.0 : 0.0;
+        }
+    }
+
+    for (int k = 0; k < exponent; ++k) {
+        double temp[a][a];
+        for (int j = 0; j < a; ++j) {
+            for (int i = 0; i < a; ++i) {
+                temp[i][j] = result[i][j];
+            }
+        }
+
+        for (int i = 0; i < a; ++i) {
+            for (int j = 0; j < a; ++j) {
+                result[i][j] = 0;
+                for (int k = 0; k < a; ++k) {
+					result[i][j] += matrix[i][k] * temp[k][j];
+                }
+            }
+        }
+    }
+}
+
 
 void dotProduct3(double matrix[a][a], double matrix1[a], double result[a]) {
     for (int i = 0; i < a; ++i) {
@@ -73,7 +106,7 @@ void calculateTransitionMatrix(double A[a][a], double T[a][a]) {
 int main() {
     std::random_device rd;
     std::mt19937 mt(rd());
-    std::uniform_int_distribution<int> dist(0, 2);//메르센 트위스터 난수 생성
+    std::uniform_int_distribution<int> dist(0, 3);//메르센 트위스터 난수 생성
 
     double M[a][a];
 
@@ -102,24 +135,38 @@ int main() {
 
     calculateTransitionMatrix(M, L);
 
-    for (int i = 0; i < a; i++) {
-        for (int j = 0; j < a; j++) {
-            printf("%f ", L[i][j]);
-        }
-        printf("\n");
-    }//L 출력
-
-
-
+//    for (int i = 0; i < a; i++) {
+//        for (int j = 0; j < a; j++) {
+//            printf("%f ", L[i][j]);
+//        }
+//        printf("\n");
+//    }//L 출력
+    
+    
+    clock_t start1 = clock();
     for (int k = 0; k < 40; ++k) {
-        matrixPower(L, k, result);
+        matrixPower2(L, k, result);
 
         dotProduct3(result, x, _result);
 
-        printf("Iteration %d:\n", k);
-        printMatrix(_result);
+//        printf("Iteration %d:\n", k);
+//        printMatrix(_result);
     }
     
+    clock_t end1 = clock();
+    printf("소요 시간(개선전): %lf\n", (double)(end1 - start1) / CLOCKS_PER_SEC);
+    
+    
+    clock_t start2 = clock();
+    for (int k = 0; k < 40; ++k) {
+        matrixPower1(L, k, result);
 
+        dotProduct3(result, x, _result);
 
+//        printf("Iteration %d:\n", k);
+//        printMatrix(_result);
+    }
+    
+    clock_t end2 = clock();
+    printf("소요 시간(개선후): %lf\n", (double)(end2 - start2) / CLOCKS_PER_SEC);
 }
