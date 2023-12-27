@@ -2,7 +2,7 @@
 #include <random>
 #include <time.h>
 
-const int a = 170;//행렬 크기 설정
+const int a = 252;//행렬 크기 설정
 
 void printMatrix(double matrix[a]) {
     for (int i = 0; i < a; ++i) {
@@ -12,38 +12,7 @@ void printMatrix(double matrix[a]) {
 }
 
 
-void matrixPower2(double matrix[a][a], int exponent, double result[a][a]) {
-    for (int i = 0; i < a; ++i) {
-        for (int j = 0; j < a; ++j) {
-            result[i][j] = (i == j) ? 1.0 : 0.0;
-        }
-    }
-
-    for (int k = 0; k < exponent; ++k) {
-        double temp[a][a];
-        for (int j = 0; j < a; ++j) {
-            for (int i = 0; i < a; ++i) {
-                temp[i][j] = result[i][j];
-            }
-        }
-
-        for (int i = 0; i < a; ++i) {
-            for (int j = 0; j < a; ++j) {
-                result[i][j] = 0;
-                for (int k = 0; k < a; ++k) {
-                	if (matrix[i][k] == 0) {
-                		result[i][j] = 0;
-					} else {
-						result[i][j] += matrix[i][k] * temp[k][j];
-					}
-                    
-                }
-            }
-        }
-    }
-}
-
-void matrixPower1(double matrix[a][a], int exponent, double result[a][a]) {
+void matrixPower_after(double matrix[a][a], int exponent, double result[a][a]) {
     for (int i = 0; i < a; ++i) {
         for (int j = 0; j < a; ++j) {
             result[i][j] = (i == j) ? 1.0 : 0.0;
@@ -62,7 +31,38 @@ void matrixPower1(double matrix[a][a], int exponent, double result[a][a]) {
             for (int j = 0; j < a; ++j) {
                 result[i][j] = 0;
                 for (int k = 0; k < a; ++k) {
-					result[i][j] += matrix[i][k] * temp;
+                	if (matrix[i][k] == 0) {
+                		result[i][j] = 0;
+					} else {
+						result[i][j] += matrix[i][k] * temp;
+					}
+                    
+                }
+            }
+        }
+    }
+}
+
+void matrixPower_before(double matrix[a][a], int exponent, double result[a][a]) {
+    for (int i = 0; i < a; ++i) {
+        for (int j = 0; j < a; ++j) {
+            result[i][j] = (i == j) ? 1.0 : 0.0;
+        }
+    }
+
+    for (int k = 0; k < exponent; ++k) {
+        double temp[a][a];
+        for (int j = 0; j < a; ++j) {
+            for (int i = 0; i < a; ++i) {
+                temp[i][j] = result[i][j];
+            }
+        }
+
+        for (int i = 0; i < a; ++i) {
+            for (int j = 0; j < a; ++j) {
+                result[i][j] = 0;
+                for (int k = 0; k < a; ++k) {
+					result[i][j] += matrix[i][k] * temp[k][j];
                 }
             }
         }
@@ -145,7 +145,7 @@ int main() {
     
     clock_t start1 = clock();
     for (int k = 0; k < 40; ++k) {
-        matrixPower2(L, k, result);
+        matrixPower_before(L, k, result);
 
         dotProduct3(result, x, _result);
 
@@ -154,12 +154,12 @@ int main() {
     }
     
     clock_t end1 = clock();
-    printf("소요 시간(개선전): %lf\n", (double)(end1 - start1) / CLOCKS_PER_SEC);
+    printf("소요 시간(최적화전): %lfs\n", (double)(end1 - start1) / CLOCKS_PER_SEC);
     
     
     clock_t start2 = clock();
     for (int k = 0; k < 40; ++k) {
-        matrixPower1(L, k, result);
+        matrixPower_after(L, k, result);
 
         dotProduct3(result, x, _result);
 
@@ -168,5 +168,5 @@ int main() {
     }
     
     clock_t end2 = clock();
-    printf("소요 시간(개선후): %lf\n", (double)(end2 - start2) / CLOCKS_PER_SEC);
+    printf("소요 시간(최적화후): %lfs\n", (double)(end2 - start2) / CLOCKS_PER_SEC);
 }
