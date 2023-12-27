@@ -2,7 +2,7 @@
 #include <random>
 #include <time.h>
 
-const int a = 100;//행렬 크기 설정
+const int a = 170;//행렬 크기 설정
 
 void printMatrix(double matrix[a]) {
     for (int i = 0; i < a; ++i) {
@@ -51,10 +51,10 @@ void matrixPower1(double matrix[a][a], int exponent, double result[a][a]) {
     }
 
     for (int k = 0; k < exponent; ++k) {
-        double temp[a][a];
+        double temp;
         for (int j = 0; j < a; ++j) {
             for (int i = 0; i < a; ++i) {
-                temp[i][j] = result[i][j];
+                temp = result[i][j];
             }
         }
 
@@ -62,7 +62,7 @@ void matrixPower1(double matrix[a][a], int exponent, double result[a][a]) {
             for (int j = 0; j < a; ++j) {
                 result[i][j] = 0;
                 for (int k = 0; k < a; ++k) {
-					result[i][j] += matrix[i][k] * temp[k][j];
+					result[i][j] += matrix[i][k] * temp;
                 }
             }
         }
